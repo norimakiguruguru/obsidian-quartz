@@ -1,0 +1,39 @@
+# .github/workflows/update-submodule.yml
+name: Update Submodule
+ 
+on:
+  schedule:
+    # 毎日 0:00 JST (15:00 UTC) に実行
+    - cron: '0 15 * * *'
+  workflow_dispatch:  # 手動実行も可能
+ 
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+        submodules: recursive
+    
+    - name: Update submodule to latest
+      run: |
+        # サブモジュールを強制的に最新に更新
+        git submodule update --remote --force
+ 
+        # 変更があるかチェック
+        if git diff --quiet --exit-code; then
+          echo "No changes to commit"
+          exit 0
+        fi
+        
+        # Git設定
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # 変更をコミット
+        git add .
+        git commit -m "Auto-update submodule to latest commit"
+        git push
