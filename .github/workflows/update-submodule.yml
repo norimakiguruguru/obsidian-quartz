@@ -36,4 +36,5 @@ jobs:
         # 変更をコミット
         git add .
         git commit -m "Auto-update submodule to latest commit"
+        git pull --rebase origin v4
         git push
